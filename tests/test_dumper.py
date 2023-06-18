@@ -3,7 +3,7 @@ from typing import Any, Dict, Union
 
 import yaml
 
-import yaml_hooks
+import yaml_utils
 
 # TODO lists:
 #   * test before/after first list iter
@@ -32,7 +32,7 @@ class Tests:
         style: Union[Dict[str, Any], None] = None,
     ) -> str:
         # run custom dumper with args and return result
-        dumper = yaml_hooks.create_dumper(
+        dumper = yaml_utils.create_dumper(
             before=before,
             after=after,
             style=style,
