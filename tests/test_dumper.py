@@ -143,8 +143,8 @@ d: true
 
     def test_high_depth(self) -> None:
         data = {"a": {"b": {"c": {"d": 1}}}}
-        before = {"a": "# ba", "b": "# bb", "c": "# bc", "d": "#bd"}
-        after = {"a": "# aa", "b": "# ab", "c": "# ac", "d": "# ad"}
+        before = {"a$": "# ba", "b$": "# bb", "c$": "# bc", "d$": "# bd"}
+        after = {"a$": "# aa", "b$": "# ab", "c$": "# ac", "d$": "# ad"}
         result = self.dump_with_args(data, after=after, before=before)
 
         assert (
@@ -162,5 +162,5 @@ a:
     # ac
   # ab
 # aa
-        """.lstrip()
+""".lstrip()
         )
