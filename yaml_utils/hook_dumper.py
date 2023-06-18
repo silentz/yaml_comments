@@ -215,13 +215,23 @@ class _Dumper(yaml.Dumper):
                 return super().resolve(kind, from_cache, implicit)
         return super().resolve(kind, value, implicit)
 
+    def _get_level(self, a: str) -> int:
+        return a.count(self._delim)
+
     def _check_same_level(self, a: str, b: str) -> bool:
-        return a.count(self._delim) == b.count(self._delim)
+        return self._get_level(a) == self._get_level(b)
 
     def _get_path_prev_level(self, path: str) -> str:
         tokens = path.split(self._delim)
         tokens = tokens[:-1]
         return self._delim.join(tokens)
+
+    def represent(self, *args, **kwargs) -> None:
+        super().represent(*args, **kwargs)
+        if self._last_hooked_after is not None:
+            if self._get_level(self._last_hooked_after) > 0:
+                # find indent size
+                print(self.indent)
 
     def _hook_processor(self, inner: Callable, text: str, *args, **kwargs) -> Any:
         marker_type, path = self._extract_marker(text)
