@@ -1,0 +1,7 @@
+test.py
+test.yml
+
+*.pyc
+__pycache__/
+idea/*
+.DS_Store
