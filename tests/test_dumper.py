@@ -73,7 +73,7 @@ d: true
         )
 
     def test_after_global_keys(self) -> None:
-        data = {"a": "1", "b": [1, 1], "c": None, "d": True}
+        data = {"a": {"test": 1}, "b": [1, 1], "c": None, "d": True}
         after = {
             "^a$": "# after a",
             "^b$": "# after b",
@@ -85,7 +85,8 @@ d: true
         assert (
             result
             == """
-a: '1'
+a:
+  test: 1
 # after a
 b:
 - 1

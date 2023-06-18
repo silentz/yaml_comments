@@ -127,6 +127,7 @@ class _Dumper(yaml.Dumper):
         self._style = style.copy() if isinstance(style, dict) else dict()
         self._after = after.copy() if isinstance(after, dict) else dict()
         self._before = before.copy() if isinstance(before, dict) else dict()
+        self._last_hooked_after = None
         self.stream = _StreamWrapper(self.stream)  # type: ignore
 
     def __del__(self):
@@ -214,10 +215,24 @@ class _Dumper(yaml.Dumper):
                 return super().resolve(kind, from_cache, implicit)
         return super().resolve(kind, value, implicit)
 
+    def _check_same_level(self, a: str, b: str) -> bool:
+        return a.count(self._delim) == b.count(self._delim)
+
+    def _get_path_prev_level(self, path: str) -> str:
+        tokens = path.split(self._delim)
+        tokens = tokens[:-1]
+        return self._delim.join(tokens)
+
     def _hook_processor(self, inner: Callable, text: str, *args, **kwargs) -> Any:
         marker_type, path = self._extract_marker(text)
 
         if marker_type is not None:
+            if self._last_hooked_after is not None:
+                if not self._check_same_level(path, self._last_hooked_after):
+                    prev_level = self._get_path_prev_level(self._last_hooked_after)
+                    self._process_hook_after(prev_level)
+                    self._last_hooked_after = None
+
             text = self._cache[text]
             if marker_type == self._replace_marker_key:
                 self._process_hook_before(path)
@@ -229,8 +244,10 @@ class _Dumper(yaml.Dumper):
         if marker_type is not None:
             if marker_type == self._replace_marker_value:
                 self._process_hook_after(path)
+                self._last_hooked_after = path
             elif marker_type == self._replace_marker_item:
                 self._process_hook_after(path)
+                self._last_hooked_after = path
 
         return inner_out
 
@@ -283,16 +300,12 @@ class _Dumper(yaml.Dumper):
                     self.stream.write("\n")
                     self.line += 1
 
-                n_lines = len(lines)
-
-                for lidx, line in enumerate(lines):
-                    self.stream.write(line)
-                    if lidx + 1 < n_lines:
-                        self.stream.write("\n")
-                        self.line += 1
+                for line in lines:
+                    self.stream.write(line + "\n")
+                    self.line += 1
 
                 self.column = 0
-                self.whitespace = False
+                self.whitespace = True
                 self.indention = True
 
 
