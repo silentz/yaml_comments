@@ -20,7 +20,6 @@ import yaml_utils
 #   * test different indents
 
 # TODO misc:
-#   * high depth of data structures
 #   * comment before list vs comment before first list item
 #   * before/after list item inside a dict
 #   * before/after dict item inside a list
@@ -162,5 +161,34 @@ a:
     # ac
   # ab
 # aa
+""".lstrip()
+        )
+
+    def test_list(self) -> None:
+        data = {"a": 1, "b": {"i": [1, 2, 3]}, "c": 1}
+        before = {
+            "^b/i$": "# before list",
+            "^b/i/0$": "# before first item",
+        }
+        after = {
+            "^b/i$": "# after list",
+            "^b/i/0$": "# after first item",
+        }
+        result = self.dump_with_args(data, before=before, after=after)
+
+        assert (
+            result
+            == """
+a: 1
+b:
+  # before list
+  i:
+  # before first item
+  - 1
+  # after first item
+  - 2
+  - 3
+  # after list
+c: 1
 """.lstrip()
         )

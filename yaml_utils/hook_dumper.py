@@ -245,10 +245,15 @@ class _Dumper(yaml.Dumper):
 
         if marker_type is not None:
             if self._last_hooked_after is not None:
-                if not self._check_same_level(path, self._last_hooked_after):
+                level_last = self._get_level(self._last_hooked_after)
+                level_current = self._get_level(path)
+                if level_last != level_current:
                     prev_level = self._get_path_prev_level(self._last_hooked_after)
+                    copy_indents = self.indents
+                    self.indents = [(level_last - 1) * self.best_indent]
                     self._process_hook_after(prev_level)
                     self._last_hooked_after = prev_level
+                    self.indents = copy_indents
 
             text = self._cache[text]
             if marker_type == self._replace_marker_key:
