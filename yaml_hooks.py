@@ -33,7 +33,6 @@ class _StreamWrapper(io.StringIO):
     def close(self) -> None:
         self._myflush()
         self._sync.close()
-        self._origin.close()
 
     @property
     def closed(self) -> bool:
@@ -108,7 +107,6 @@ class _StreamWrapper(io.StringIO):
 
 
 class _Dumper(yaml.Dumper):
-    _delim = "/"
     _replace_marker_key = "__loc_dumper_key"
     _replace_marker_item = "__loc_dumper_item"
     _replace_marker_value = "__loc_dumper_value"
@@ -119,11 +117,13 @@ class _Dumper(yaml.Dumper):
         style: Union[Dict[str, Any], None] = None,
         before: Union[Dict[str, Any], None] = None,
         after: Union[Dict[str, Any], None] = None,
+        delimiter: str = "/",
         **kwargs,
     ):
         super().__init__(*args, **kwargs)
         self._cache = dict()
         self._path = list()
+        self._delim = delimiter
         self._style = style.copy() if isinstance(style, dict) else dict()
         self._after = after.copy() if isinstance(after, dict) else dict()
         self._before = before.copy() if isinstance(before, dict) else dict()
@@ -298,5 +298,12 @@ class Dumper(yaml.Dumper):
         style: Union[Dict[str, Any], None] = None,
         before: Union[Dict[str, Any], None] = None,
         after: Union[Dict[str, Any], None] = None,
+        delimiter: str = "/",
     ) -> Type[_Dumper]:
-        return functools.partial(_Dumper, style=style, after=after, before=before)  # type: ignore
+        return functools.partial(
+            _Dumper,
+            style=style,
+            after=after,
+            before=before,
+            delimiter=delimiter,
+        )  # type: ignore
