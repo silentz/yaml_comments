@@ -17,7 +17,6 @@ import yaml_utils
 #   * test different indents
 
 # TODO misc:
-#   * comment before list vs comment before first list item
 #   * before/after list item inside a dict
 #   * before/after dict item inside a list
 
