@@ -292,18 +292,16 @@ class _Dumper(yaml.Dumper):
                 self.indention = True
 
 
-class Dumper(yaml.Dumper):
-    @staticmethod
-    def spawn(
-        style: Union[Dict[str, Any], None] = None,
-        before: Union[Dict[str, Any], None] = None,
-        after: Union[Dict[str, Any], None] = None,
-        delimiter: str = "/",
-    ) -> Type[_Dumper]:
-        return functools.partial(
-            _Dumper,
-            style=style,
-            after=after,
-            before=before,
-            delimiter=delimiter,
-        )  # type: ignore
+def create_dumper(
+    style: Union[Dict[str, Any], None] = None,
+    before: Union[Dict[str, Any], None] = None,
+    after: Union[Dict[str, Any], None] = None,
+    delimiter: str = "/",
+) -> Type[_Dumper]:
+    return functools.partial(
+        _Dumper,
+        style=style,
+        after=after,
+        before=before,
+        delimiter=delimiter,
+    )  # type: ignore

@@ -32,7 +32,7 @@ class Tests:
         style: Union[Dict[str, Any], None] = None,
     ) -> str:
         # run custom dumper with args and return result
-        dumper = yaml_hooks.Dumper.spawn(
+        dumper = yaml_hooks.create_dumper(
             before=before, after=after, style=style, delimiter="/"
         )
         buffer = io.StringIO(initial_value="")
