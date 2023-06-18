@@ -80,7 +80,6 @@ d: true
             "^d$": "# after d",
         }
         result = self.dump_with_args(data, after=after)
-        print(result)
         assert (
             result
             == """
@@ -113,7 +112,6 @@ d: true
             "^d$": "# after d 1\n# after d 2",
         }
         result = self.dump_with_args(data, after=after, before=before)
-        print(result)
         assert (
             result
             == """
@@ -141,4 +139,28 @@ d: true
 # after d 1
 # after d 2
 """.lstrip()
+        )
+
+    def test_high_depth(self) -> None:
+        data = {"a": {"b": {"c": {"d": 1}}}}
+        before = {"a": "# ba", "b": "# bb", "c": "# bc", "d": "#bd"}
+        after = {"a": "# aa", "b": "# ab", "c": "# ac", "d": "# ad"}
+        result = self.dump_with_args(data, after=after, before=before)
+
+        assert (
+            result
+            == """
+# ba
+a:
+  # bb
+  b:
+    # bc
+    c:
+      # bd
+      d: 1
+      # ad
+    # ac
+  # ab
+# aa
+        """.lstrip()
         )
