@@ -229,9 +229,16 @@ class _Dumper(yaml.Dumper):
     def represent(self, *args, **kwargs) -> None:
         super().represent(*args, **kwargs)
         if self._last_hooked_after is not None:
-            if self._get_level(self._last_hooked_after) > 0:
-                # find indent size
-                print(self.indent)
+            rem_levels = self._get_level(self._last_hooked_after)
+            if rem_levels > 0:
+                for idx in range(rem_levels):
+                    shift = (rem_levels - idx - 1) * self.best_indent
+                    self.indents = [shift]
+                    self._last_hooked_after = self._get_path_prev_level(
+                        self._last_hooked_after
+                    )
+                    self._process_hook_after(self._last_hooked_after)
+                self.indents = []
 
     def _hook_processor(self, inner: Callable, text: str, *args, **kwargs) -> Any:
         marker_type, path = self._extract_marker(text)
