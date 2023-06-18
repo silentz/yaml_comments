@@ -283,9 +283,13 @@ class _Dumper(yaml.Dumper):
                     self.stream.write("\n")
                     self.line += 1
 
-                for line in lines:
-                    self.stream.write(line + "\n")
-                    self.line += 1
+                n_lines = len(lines)
+
+                for lidx, line in enumerate(lines):
+                    self.stream.write(line)
+                    if lidx + 1 < n_lines:
+                        self.stream.write("\n")
+                        self.line += 1
 
                 self.column = 0
                 self.whitespace = False
