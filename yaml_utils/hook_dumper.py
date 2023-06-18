@@ -231,7 +231,7 @@ class _Dumper(yaml.Dumper):
                 if not self._check_same_level(path, self._last_hooked_after):
                     prev_level = self._get_path_prev_level(self._last_hooked_after)
                     self._process_hook_after(prev_level)
-                    self._last_hooked_after = None
+                    self._last_hooked_after = prev_level
 
             text = self._cache[text]
             if marker_type == self._replace_marker_key:
