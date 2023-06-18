@@ -21,7 +21,6 @@ import yaml_utils
 
 # TODO misc:
 #   * high depth of data structures
-#   * multiline strings in comments
 #   * comment before list vs comment before first list item
 #   * before/after list item inside a dict
 #   * before/after dict item inside a list
@@ -96,5 +95,50 @@ c: null
 # after c
 d: true
 # after d
+""".lstrip()
+        )
+
+    def test_multiple_lines(self) -> None:
+        data = {"a": {"test": 1}, "b": [1, 1], "c": None, "d": True}
+        before = {
+            "^a$": "# before a 1\n# before a 2",
+            "^b$": "# before b 1\n# before b 2",
+            "^c$": "# before c 1\n# before c 2",
+            "^d$": "# before d 1\n# before d 2",
+        }
+        after = {
+            "^a$": "# after a 1\n# after a 2",
+            "^b$": "# after b 1\n# after b 2",
+            "^c$": "# after c 1\n# after c 2",
+            "^d$": "# after d 1\n# after d 2",
+        }
+        result = self.dump_with_args(data, after=after, before=before)
+        print(result)
+        assert (
+            result
+            == """
+# before a 1
+# before a 2
+a:
+  test: 1
+# after a 1
+# after a 2
+# before b 1
+# before b 2
+b:
+- 1
+- 1
+# after b 1
+# after b 2
+# before c 1
+# before c 2
+c: null
+# after c 1
+# after c 2
+# before d 1
+# before d 2
+d: true
+# after d 1
+# after d 2
 """.lstrip()
         )
