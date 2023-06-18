@@ -1,0 +1,15 @@
+[tool.poetry]
+name = "yaml-hooks"
+version = "0.1.0"
+description = ""
+authors = ["Max Pershin <mepershin@gmail.com>"]
+readme = "README.md"
+packages = [{include = "yaml_hooks"}]
+
+[tool.poetry.dependencies]
+python = "^3.6"
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
