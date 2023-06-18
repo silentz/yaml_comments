@@ -24,6 +24,26 @@ class Tests:
         return buffer.getvalue()
 
     def test_before_global_keys(self) -> None:
-        data = {"a": "1", "b": [1, 1, 1], "c": None, "d": True}
-        result = self.dump_with_args(data)
-        print(result)
+        data = {"a": "1", "b": [1, 1], "c": None, "d": True}
+        before = {
+            "^a$": "# before a",
+            "^b$": "# before b",
+            "^c$": "# before c",
+            "^d$": "# before d",
+        }
+        result = self.dump_with_args(data, before=before)
+        assert (
+            result
+            == """
+# before a
+a: '1'
+# before b
+b:
+- 1
+- 1
+# before c
+c: null
+# before d
+d: true
+""".lstrip()
+        )

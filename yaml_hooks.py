@@ -36,7 +36,7 @@ class _StreamWrapper(io.StringIO):
 
     @property
     def closed(self) -> bool:
-        return self._origin.closed
+        return self._sync.closed
 
     def fileno(self) -> int:
         return self._origin.fileno()
