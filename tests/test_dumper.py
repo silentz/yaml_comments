@@ -1,5 +1,9 @@
 import io
+import os
+import sys
 from typing import Any, Dict, Union
+
+sys.path.insert(0, os.path.abspath(os.curdir))
 
 import yaml
 
