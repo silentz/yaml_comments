@@ -10,9 +10,6 @@ import yaml
 import yaml_utils
 
 # TODO lists:
-#   * test before/after first list iter
-#   * test before/after last list iterm
-#   * test before/after inner list item
 #   * test on empty lists
 #   * test on single-item lists
 
@@ -165,14 +162,18 @@ a:
         )
 
     def test_list(self) -> None:
-        data = {"a": 1, "b": {"i": [1, 2, 3]}, "c": 1}
+        data = {"a": 1, "b": {"i": [1, 2, 3, 4, 5]}, "c": 1}
         before = {
             "^b/i$": "# before list",
             "^b/i/0$": "# before first item",
+            "^b/i/2$": "# before middle item",
+            "^b/i/4$": "# before last item",
         }
         after = {
             "^b/i$": "# after list",
             "^b/i/0$": "# after first item",
+            "^b/i/2$": "# after middle item",
+            "^b/i/4$": "# after last item",
         }
         result = self.dump_with_args(data, before=before, after=after)
 
@@ -187,7 +188,13 @@ b:
   - 1
   # after first item
   - 2
+  # before middle item
   - 3
+  # after middle item
+  - 4
+  # before last item
+  - 5
+  # after last item
   # after list
 c: 1
 """.lstrip()
