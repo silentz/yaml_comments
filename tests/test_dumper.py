@@ -320,6 +320,10 @@ a:
 """.lstrip()
         )
 
+    def test_different_indent_04(self) -> None:
+        # TODO
+        pass
+
     def test_different_indent_07(self) -> None:
         data = {"a": [{"b": [{"c": [1]}]}]}
         before = {
