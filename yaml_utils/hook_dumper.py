@@ -81,10 +81,6 @@ class _StreamWrapper(io.StringIO):
         return self._sync.writelines(__lines)
 
     def write(self, __s: str) -> int:
-        import traceback
-
-        f_info = traceback.extract_stack(limit=2)
-        print("WRITE", f_info[0].name, repr(__s))
         return self._sync.write(__s)
 
     def read(self, __size: Union[int, None] = ...) -> str:
@@ -330,11 +326,16 @@ class _Dumper(yaml.Dumper):
 
         for rule, data in self._before.items():
             if re.search(rule, path):
-                if self._is_last_sequence(path):
+                cur_indent = self.column
+
+                if self._is_last_sequence(path) and not missing:
+                    self.stream.seek_prev_line()  # type: ignore
+                    self.stream.write(" " * self.indents[-1])
+                    cur_indent = self.indents[-1]
+                elif self._is_last_sequence(path) and missing:
                     self.stream.seek_prev_line()  # type: ignore
                     self.stream.write(" " * self.indents[-1])
 
-                cur_indent = self.column
                 lines = data.split("\n")
                 lines = [" " * cur_indent + x for x in lines]
                 lines[0] = lines[0].lstrip()
@@ -344,10 +345,10 @@ class _Dumper(yaml.Dumper):
                     self.line += 1
 
                 if self._is_last_sequence(path) and not missing:
-                    self.stream.write(" " * max(0, cur_indent - 1))
+                    self.stream.write(" " * max(0, self.column - 1))
                     self.stream.write("-")
                 elif self._is_last_sequence(path) and missing:
-                    self.stream.write(" " * max(0, cur_indent))
+                    self.stream.write(" " * max(0, self.column))
                     self.stream.write("-")
                     self.stream.write(" " * max(0, self.best_indent - 1))
                 else:

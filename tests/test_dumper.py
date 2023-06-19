@@ -420,7 +420,6 @@ a:
             "^a/0/b/0/c/0$": "# after c0\n# after c0",
         }
         result = self.dump_with_args(data, before=before, after=after, indent=3)
-        print(result)
 
         assert (
             result
@@ -440,7 +439,7 @@ a:
       c:
       # before c0
       # before c0
-      - 1
+      - 11
       # after c0
       # after c0
       # after c
