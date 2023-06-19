@@ -261,7 +261,18 @@ class _Dumper(yaml.Dumper):
                 self.indents = copy_indents
 
         if self._last_hooked_before is not None:
-            print(self._last_hooked_before)
+            level_last = self._get_level(self._last_hooked_before)
+            level_current = self._get_level(path)
+            if level_current > level_last + 1:
+                prev_level = self._get_path_prev_level(path)
+                copy_indents = self.indents
+                self.indents = [copy_indents[-2]]
+                copy_column = self.column
+                self.column = copy_indents[-2]
+                self._process_hook_before(prev_level, missing=True)
+                self._last_hooked_before = prev_level
+                self.indents = copy_indents
+                self.column = copy_column
 
         if marker_type is not None:
             text = self._cache[text]
@@ -297,7 +308,7 @@ class _Dumper(yaml.Dumper):
     def write_double_quoted(self, text, split=True):
         return self._hook_processor(super().write_double_quoted, text, split)
 
-    def _process_hook_before(self, path: str) -> None:
+    def _process_hook_before(self, path: str, missing: bool = False) -> None:
         if path in self._before_hook_cache:
             return
 
@@ -318,9 +329,12 @@ class _Dumper(yaml.Dumper):
                     self.stream.write(line + "\n")
                     self.line += 1
 
-                if self._is_last_sequence(path):
+                if self._is_last_sequence(path) and not missing:
                     self.stream.write(" " * max(0, cur_indent - 1))
                     self.stream.write("-")
+                elif self._is_last_sequence(path) and missing:
+                    self.stream.write(" " * max(0, cur_indent))
+                    self.stream.write("- ")
                 else:
                     self.stream.write(" " * cur_indent)
 
