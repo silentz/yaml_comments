@@ -198,3 +198,29 @@ b:
 c: 1
 """.lstrip()
         )
+
+    def test_single_item_list(self) -> None:
+        data = {"a": {"b": {"c": [1]}}}
+        before = {
+            "^a/b/c$": "# before list",
+            "^a/b/c/0$": "# before first item",
+        }
+        after = {
+            "^a/b/c$": "# after list",
+            "^a/b/c/0$": "# after first item",
+        }
+        result = self.dump_with_args(data, before=before, after=after)
+
+        assert (
+            result
+            == """
+a:
+  b:
+    # before list
+    c:
+    # before first item
+    - 1
+    # after first item
+    # after list
+""".lstrip()
+        )
