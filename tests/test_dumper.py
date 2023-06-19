@@ -10,9 +10,7 @@ import yaml
 import yaml_utils
 
 # TODO indents:
-#   * test different indents
-#   * test multiline with diefferent indents
-#   * test multiline in list-dict combinations
+#   * test multiline commens with diefferent indents
 
 # TODO styles:
 #   * test different string styles
@@ -27,6 +25,7 @@ class Tests:
         before: Union[Dict[str, Any], None] = None,
         after: Union[Dict[str, Any], None] = None,
         style: Union[Dict[str, Any], None] = None,
+        indent: int = 2,
     ) -> str:
         # run custom dumper with args and return result
         dumper = yaml_utils.create_dumper(
@@ -36,7 +35,7 @@ class Tests:
             delimiter="/",
         )
         buffer = io.StringIO(initial_value="")
-        yaml.dump(data, buffer, dumper)
+        yaml.dump(data, buffer, dumper, indent=indent)
         buffer.seek(0)
         return buffer.getvalue()
 
@@ -316,6 +315,41 @@ a:
     # after c
   # after b0
   # after b
+# after a0
+# after a
+""".lstrip()
+        )
+
+    def test_different_indent_07(self) -> None:
+        data = {"a": [{"b": [{"c": [1]}]}]}
+        before = {
+            "^a$": "# before a",
+            "^a/0$": "# before a0",
+            # "^a/0/b$": "# before b",
+            # "^a/0/b/0$": "# before b0",
+            # "^a/0/b/0/c$": "# before c",
+            # "^a/0/b/0/c/0$": "# before c0",
+        }
+        after = {
+            "^a$": "# after a",
+            "^a/0$": "# after a0",
+            # "^a/0/b$": "# after b",
+            # "^a/0/b/0$": "# after b0",
+            # "^a/0/b/0/c$": "# after c",
+            # "^a/0/b/0/c/0$": "# after c0",
+        }
+        result = self.dump_with_args(data, before=before, after=after, indent=7)
+        print(result)
+
+        assert (
+            result
+            == """
+# before a
+a:
+# before a0
+-      b:
+       -      c:
+              - 1
 # after a0
 # after a
 """.lstrip()
