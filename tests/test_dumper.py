@@ -280,7 +280,16 @@ a:
             "^a/0/b/0/c/0/d$": "# before d",
             "^a/0/b/0/c/0/d/0$": "# before d0",
         }
-        after = {}
+        after = {
+            "^a$": "# after a",
+            "^a/0$": "# after a0",
+            "^a/0/b$": "# after b",
+            "^a/0/b/0$": "# after b0",
+            "^a/0/b/0/c$": "# after c",
+            "^a/0/b/0/c/0$": "# after c0",
+            "^a/0/b/0/c/0/d$": "# after d",
+            "^a/0/b/0/c/0/d/0$": "# after d0",
+        }
         result = self.dump_with_args(data, before=before, after=after)
 
         assert (
@@ -299,5 +308,13 @@ a:
       d:
       # before d0
       - 1
+      # after d0
+      # after d
+    # after c0
+    # after c
+  # after b0
+  # after b
+# after a0
+# after a
 """.lstrip()
         )
