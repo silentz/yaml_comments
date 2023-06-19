@@ -329,21 +329,20 @@ a:
         before = {
             "^a$": "# before a",
             "^a/0$": "# before a0",
-            # "^a/0/b$": "# before b",
-            # "^a/0/b/0$": "# before b0",
-            # "^a/0/b/0/c$": "# before c",
-            # "^a/0/b/0/c/0$": "# before c0",
+            "^a/0/b$": "# before b",
+            "^a/0/b/0$": "# before b0",
+            "^a/0/b/0/c$": "# before c",
+            "^a/0/b/0/c/0$": "# before c0",
         }
         after = {
             "^a$": "# after a",
             "^a/0$": "# after a0",
-            # "^a/0/b$": "# after b",
-            # "^a/0/b/0$": "# after b0",
-            # "^a/0/b/0/c$": "# after c",
-            # "^a/0/b/0/c/0$": "# after c0",
+            "^a/0/b$": "# after b",
+            "^a/0/b/0$": "# after b0",
+            "^a/0/b/0/c$": "# after c",
+            "^a/0/b/0/c/0$": "# after c0",
         }
         result = self.dump_with_args(data, before=before, after=after, indent=7)
-        print(result)
 
         assert (
             result
@@ -351,9 +350,17 @@ a:
 # before a
 a:
 # before a0
--      b:
-       -      c:
+-      # before b
+       b:
+       # before b0
+       -      # before c
+              c:
+              # before c0
               - 1
+              # after c0
+              # after c
+       # after b0
+       # after b
 # after a0
 # after a
 """.lstrip()
