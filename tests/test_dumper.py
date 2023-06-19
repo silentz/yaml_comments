@@ -321,8 +321,46 @@ a:
         )
 
     def test_different_indent_04(self) -> None:
-        # TODO
-        pass
+        data = {"a": [{"b": [{"c": [1]}]}]}
+        before = {
+            "^a$": "# before a",
+            "^a/0$": "# before a0",
+            "^a/0/b$": "# before b",
+            "^a/0/b/0$": "# before b0",
+            "^a/0/b/0/c$": "# before c",
+            "^a/0/b/0/c/0$": "# before c0",
+        }
+        after = {
+            "^a$": "# after a",
+            "^a/0$": "# after a0",
+            "^a/0/b$": "# after b",
+            "^a/0/b/0$": "# after b0",
+            "^a/0/b/0/c$": "# after c",
+            "^a/0/b/0/c/0$": "# after c0",
+        }
+        result = self.dump_with_args(data, before=before, after=after, indent=4)
+
+        assert (
+            result
+            == """
+# before a
+a:
+# before a0
+-   # before b
+    b:
+    # before b0
+    -   # before c
+        c:
+        # before c0
+        - 1
+        # after c0
+        # after c
+    # after b0
+    # after b
+# after a0
+# after a
+""".lstrip()
+        )
 
     def test_different_indent_07(self) -> None:
         data = {"a": [{"b": [{"c": [1]}]}]}
