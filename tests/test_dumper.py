@@ -12,10 +12,6 @@ import yaml_utils
 # TODO indents:
 #   * test different indents
 
-# TODO misc:
-#   * before/after list item inside a dict
-#   * before/after dict item inside a list
-
 # TODO styles:
 #   * test different string styles
 #   * test different list styles + comments
@@ -269,5 +265,39 @@ a:
     # before dict
     c: {}
     # after dict
+""".lstrip()
+        )
+
+    def test_dict_and_list_combinations(self) -> None:
+        data = {"a": [{"b": [{"c": [{"d": [1]}]}]}]}
+        before = {
+            "^a$": "# before a",
+            "^a/0$": "# before a0",
+            "^a/0/b$": "# before b",
+            "^a/0/b/0$": "# before b0",
+            "^a/0/b/0/c$": "# before c",
+            "^a/0/b/0/c/0$": "# before c0",
+            "^a/0/b/0/c/0/d$": "# before d",
+            "^a/0/b/0/c/0/d/0$": "# before d0",
+        }
+        after = {}
+        result = self.dump_with_args(data, before=before, after=after)
+
+        assert (
+            result
+            == """
+# before a
+a:
+# before a0
+- # before b
+  b:
+  # before b0
+  - # before c
+    c:
+    # before c0
+    - # before d
+      d:
+      # before d0
+      - 1
 """.lstrip()
         )
