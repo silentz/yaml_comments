@@ -9,10 +9,6 @@ import yaml
 
 import yaml_utils
 
-# TODO lists:
-#   * test on empty lists
-#   * test on single-item lists
-
 # TODO indents:
 #   * test different indents
 
@@ -222,5 +218,53 @@ a:
     - 1
     # after first item
     # after list
+""".lstrip()
+        )
+
+    def test_empty_list(self) -> None:
+        data = {"a": {"b": {"c": []}}}
+        before = {
+            "^a/b/c$": "# before list",
+            "^a/b/c/0$": "# before first item",
+        }
+        after = {
+            "^a/b/c$": "# after list",
+            "^a/b/c/0$": "# after first item",
+        }
+        result = self.dump_with_args(data, before=before, after=after)
+        print(result)
+
+        assert (
+            result
+            == """
+a:
+  b:
+    # before list
+    c: []
+    # after list
+""".lstrip()
+        )
+
+    def test_empty_dict(self) -> None:
+        data = {"a": {"b": {"c": {}}}}
+        before = {
+            "^a/b/c$": "# before dict",
+            "^a/b/c/x$": "# before x",
+        }
+        after = {
+            "^a/b/c$": "# after dict",
+            "^a/b/c/x$": "# after x",
+        }
+        result = self.dump_with_args(data, before=before, after=after)
+        print(result)
+
+        assert (
+            result
+            == """
+a:
+  b:
+    # before dict
+    c: []
+    # after dict
 """.lstrip()
         )
