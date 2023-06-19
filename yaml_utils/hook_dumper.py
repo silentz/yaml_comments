@@ -1,3 +1,4 @@
+import copy
 import functools
 import io
 import re
@@ -136,6 +137,8 @@ class _Dumper(yaml.Dumper):
         self._after_hook_cache = set()
         self._before_hook_cache = set()
 
+        self._indent_cache = dict()
+
     def __del__(self):
         self.stream.__del__()  # type: ignore
 
@@ -232,13 +235,18 @@ class _Dumper(yaml.Dumper):
         tokens = tokens[:-1]
         return self._delim.join(tokens)
 
+    def _my_get_indent(self, path: str) -> int:
+        if path in self._indent_cache:
+            return self._indent_cache[path]
+        return 0
+
     def represent(self, *args, **kwargs) -> None:
         super().represent(*args, **kwargs)
         if self._last_hooked_after is not None:
             rem_levels = self._get_level(self._last_hooked_after)
             if rem_levels > 0:
-                for idx in range(rem_levels + 1):
-                    shift = (rem_levels - idx) * self.best_indent
+                for _ in range(rem_levels + 1):
+                    shift = self._my_get_indent(self._last_hooked_after)
                     self.indents = [shift]
                     self._process_hook_after(self._last_hooked_after)
                     self._last_hooked_after = self._get_path_prev_level(
@@ -254,8 +262,9 @@ class _Dumper(yaml.Dumper):
             level_current = self._get_level(path)
             if level_current < level_last:
                 prev_level = self._get_path_prev_level(self._last_hooked_after)
-                copy_indents = self.indents
-                self.indents = [(level_last - 1) * self.best_indent]
+                copy_indents = copy.deepcopy(self.indents)
+                last_indent = (level_last - 1) * self.best_indent
+                self.indents = [*self.indents, last_indent]
                 self._process_hook_after(prev_level)
                 self._last_hooked_after = prev_level
                 self.indents = copy_indents
@@ -265,8 +274,8 @@ class _Dumper(yaml.Dumper):
             level_current = self._get_level(path)
             if level_current > level_last + 1:
                 prev_level = self._get_path_prev_level(path)
-                copy_indents = self.indents
-                self.indents = [copy_indents[-2]]
+                copy_indents = copy.deepcopy(self.indents)
+                self.indents = self.indents[:-2]
                 copy_column = self.column
                 self.column = copy_indents[-2]
                 self._process_hook_before(prev_level, missing=True)
@@ -313,6 +322,7 @@ class _Dumper(yaml.Dumper):
             return
 
         self._before_hook_cache.add(path)
+        self._indent_cache[path] = self.column
 
         for rule, data in self._before.items():
             if re.search(rule, path):
