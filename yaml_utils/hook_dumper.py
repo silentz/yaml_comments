@@ -344,7 +344,8 @@ class _Dumper(yaml.Dumper):
                     self.stream.write("-")
                 elif self._is_last_sequence(path) and missing:
                     self.stream.write(" " * max(0, cur_indent))
-                    self.stream.write("- ")
+                    self.stream.write("-")
+                    self.stream.write(" " * max(0, self.best_indent - 1))
                 else:
                     self.stream.write(" " * cur_indent)
 
