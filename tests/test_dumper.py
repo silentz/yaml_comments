@@ -9,9 +9,6 @@ import yaml
 
 import yaml_utils
 
-# TODO indents:
-#   * test multiline commens with diefferent indents
-
 # TODO styles:
 #   * test different string styles
 #   * test different list styles + comments
