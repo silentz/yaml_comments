@@ -403,3 +403,58 @@ a:
 # after a
 """.lstrip()
         )
+
+    def test_different_indent_multiline(self) -> None:
+        data = {"a": [{"b": [{"c": [11]}]}]}
+        before = {
+            "^a$": "# before a\n# before a",
+            "^a/0$": "# before a0\n# before a0",
+            "^a/0/b$": "# before b\n# before b",
+            "^a/0/b/0$": "# before b0\n# before b0",
+            "^a/0/b/0/c$": "# before c\n# before c",
+            "^a/0/b/0/c/0$": "# before c0\n# before c0",
+        }
+        after = {
+            "^a$": "# after a\n# after a",
+            "^a/0$": "# after a0\n# after a0",
+            "^a/0/b$": "# after b\n# after b",
+            "^a/0/b/0$": "# after b0\n# after b0",
+            "^a/0/b/0/c$": "# after c\n# after c",
+            "^a/0/b/0/c/0$": "# after c0\n# after c0",
+        }
+        result = self.dump_with_args(data, before=before, after=after, indent=3)
+        print(result)
+
+        assert (
+            result
+            == """
+# before a
+# before a
+a:
+# before a0
+# before a0
+-  # before b
+   # before b
+   b:
+   # before b0
+   # before b0
+   -  # before c
+      # before c
+      c:
+      # before c0
+      # before c0
+      - 1
+      # after c0
+      # after c0
+      # after c
+      # after c
+   # after b0
+   # after b0
+   # after b
+   # after b
+# after a0
+# after a0
+# after a
+# after a
+""".lstrip()
+        )
