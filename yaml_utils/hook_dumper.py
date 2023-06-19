@@ -121,15 +121,20 @@ class _Dumper(yaml.Dumper):
         **kwargs,
     ):
         super().__init__(*args, **kwargs)
+        self.stream = _StreamWrapper(self.stream)  # type: ignore
+
         self._cache = dict()
         self._path = list()
         self._delim = delimiter
+
         self._style = style.copy() if isinstance(style, dict) else dict()
         self._after = after.copy() if isinstance(after, dict) else dict()
         self._before = before.copy() if isinstance(before, dict) else dict()
+
         self._last_hooked_after = None
+        self._last_hooked_before = None
         self._after_hook_cache = set()
-        self.stream = _StreamWrapper(self.stream)  # type: ignore
+        self._before_hook_cache = set()
 
     def __del__(self):
         self.stream.__del__()  # type: ignore
@@ -255,8 +260,12 @@ class _Dumper(yaml.Dumper):
                 self._last_hooked_after = prev_level
                 self.indents = copy_indents
 
+        if self._last_hooked_before is not None:
+            print(self._last_hooked_before)
+
         if marker_type is not None:
             text = self._cache[text]
+            self._last_hooked_before = path
             if marker_type == self._replace_marker_key:
                 self._process_hook_before(path)
             elif marker_type == self._replace_marker_item:
@@ -289,6 +298,11 @@ class _Dumper(yaml.Dumper):
         return self._hook_processor(super().write_double_quoted, text, split)
 
     def _process_hook_before(self, path: str) -> None:
+        if path in self._before_hook_cache:
+            return
+
+        self._before_hook_cache.add(path)
+
         for rule, data in self._before.items():
             if re.search(rule, path):
                 cur_indent = self.column
