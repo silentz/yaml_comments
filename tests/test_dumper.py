@@ -16,6 +16,11 @@ import yaml_utils
 #   * before/after list item inside a dict
 #   * before/after dict item inside a list
 
+# TODO styles:
+#   * test different string styles
+#   * test different list styles + comments
+#   * test different dict styles + comments
+
 
 class Tests:
     def dump_with_args(
@@ -232,7 +237,6 @@ a:
             "^a/b/c/0$": "# after first item",
         }
         result = self.dump_with_args(data, before=before, after=after)
-        print(result)
 
         assert (
             result
@@ -256,7 +260,6 @@ a:
             "^a/b/c/x$": "# after x",
         }
         result = self.dump_with_args(data, before=before, after=after)
-        print(result)
 
         assert (
             result
@@ -264,7 +267,7 @@ a:
 a:
   b:
     # before dict
-    c: []
+    c: {}
     # after dict
 """.lstrip()
         )

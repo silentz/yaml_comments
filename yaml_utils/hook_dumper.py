@@ -128,6 +128,7 @@ class _Dumper(yaml.Dumper):
         self._after = after.copy() if isinstance(after, dict) else dict()
         self._before = before.copy() if isinstance(before, dict) else dict()
         self._last_hooked_after = None
+        self._after_hook_cache = set()
         self.stream = _StreamWrapper(self.stream)  # type: ignore
 
     def __del__(self):
@@ -231,13 +232,13 @@ class _Dumper(yaml.Dumper):
         if self._last_hooked_after is not None:
             rem_levels = self._get_level(self._last_hooked_after)
             if rem_levels > 0:
-                for idx in range(rem_levels):
-                    shift = (rem_levels - idx - 1) * self.best_indent
+                for idx in range(rem_levels + 1):
+                    shift = (rem_levels - idx) * self.best_indent
                     self.indents = [shift]
+                    self._process_hook_after(self._last_hooked_after)
                     self._last_hooked_after = self._get_path_prev_level(
                         self._last_hooked_after
                     )
-                    self._process_hook_after(self._last_hooked_after)
                 self.indents = []
 
     def _hook_processor(self, inner: Callable, text: str, *args, **kwargs) -> Any:
@@ -247,7 +248,7 @@ class _Dumper(yaml.Dumper):
             if self._last_hooked_after is not None:
                 level_last = self._get_level(self._last_hooked_after)
                 level_current = self._get_level(path)
-                if level_last != level_current:
+                if level_current < level_last:
                     prev_level = self._get_path_prev_level(self._last_hooked_after)
                     copy_indents = self.indents
                     self.indents = [(level_last - 1) * self.best_indent]
@@ -264,12 +265,11 @@ class _Dumper(yaml.Dumper):
         inner_out = inner(text, *args, **kwargs)
 
         if marker_type is not None:
+            self._last_hooked_after = path
             if marker_type == self._replace_marker_value:
                 self._process_hook_after(path)
-                self._last_hooked_after = path
             elif marker_type == self._replace_marker_item:
                 self._process_hook_after(path)
-                self._last_hooked_after = path
 
         return inner_out
 
@@ -311,6 +311,11 @@ class _Dumper(yaml.Dumper):
                     self.stream.write(" " * cur_indent)
 
     def _process_hook_after(self, path: str) -> None:
+        if path in self._after_hook_cache:
+            return
+
+        self._after_hook_cache.add(path)
+
         for rule, data in self._after.items():
             if re.search(rule, path):
                 cur_indent = self.indents[-1]
