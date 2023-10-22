@@ -9,17 +9,16 @@ Also supports style choosing for string scalars, lists and mappings. See example
 
 Code:
 ```python
-data = {"a": {"b": {"c": {"d": 1}}}}
+import yaml
+import yaml_comments
 
+data = {"a": {"b": {"c": {"d": 1}}}}
 before = {"a$": "# ba", "b$": "# bb", "c$": "# bc", "d$": "# bd"}
 after = {"a$": "# aa", "b$": "# ab", "c$": "# ac", "d$": "# ad"}
 
-dumper = yaml_comments.create_dumper(
-    before=before,
-    after=after,
-)
-
-yaml.dump(data, file, dumper)
+with open("result.yml", "w") as file:
+    dumper = yaml_comments.create_dumper(before=before, after=after)
+    yaml.dump(data, file, dumper)
 ```
 
 Result:
@@ -36,4 +35,28 @@ a:
     # ac
   # ab
 # aa
+```
+
+### List styles
+
+Code:
+```python
+import yaml
+import yaml_comments
+
+data = {"a": [1, 2, 3], "b": [1, 2, 3]}
+flow_style = {"a": yaml_comments.EXPAND, "b": yaml_comments.INLINE}
+
+with open("result.yml", "w") as file:
+    dumper = yaml_comments.create_dumper(flow_style=flow_style)
+    yaml.dump(data, file, dumper)
+```
+
+Result:
+```yaml
+a:
+- 1
+- 2
+- 3
+b: [1, 2, 3]
 ```
