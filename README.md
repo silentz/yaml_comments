@@ -5,6 +5,9 @@ Also supports style choosing for string scalars, lists and mappings. See example
 
 ## Examples
 
+You can find more examples on using this lib in (test file)[/tests/test_dumper.py]. These examples
+include different corner cases, like adding a comment to N-th list element or to a specific dict key or value.
+
 ### TLDR
 
 Code:
@@ -59,4 +62,27 @@ a:
 - 2
 - 3
 b: [1, 2, 3]
+```
+
+### Dict styles
+
+Code:
+```python
+import yaml
+import yaml_comments
+
+data = {"a": {"k1": "v1", "k2": "v2"}, "b": {"k1": "v1", "k2": "v2"}}
+flow_style = {"a": yaml_comments.EXPAND, "b": yaml_comments.INLINE}
+
+with open("result.yml", "w") as file:
+    dumper = yaml_comments.create_dumper(flow_style=flow_style)
+    yaml.dump(data, file, dumper)
+```
+
+Result:
+```yaml
+a:
+  k1: v1
+  k2: v2
+b: {k1: v1, k2: v2}
 ```
