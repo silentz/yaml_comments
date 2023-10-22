@@ -8,6 +8,36 @@ Also supports style choosing for string scalars, lists and mappings. See example
 You can find more examples on using this lib in [tests/test_dumper.py](/tests/test_dumper.py). These examples
 include different corner cases, like adding a comment to N-th list element or to a specific dict key or value.
 
+### Basic case
+
+In this example descriptor for writing a comment looks like this: `$a/b/c/d/1$`. This path
+is composed of dict keys and `/` delimiter. If you want to use some other delimiter, you
+should pass it to `create_dumper` function like this: `yaml_comments.create_dumper(..., delimiter="#")`.
+
+Code:
+```python
+import yaml
+import yaml_comments
+
+data = {"a": {"b": {"c": {"d": [1, 2]}}}}
+before = {"^a/b/c/d/1$": "# test comment"}
+
+with open("result.yml", "w") as file:
+    dumper = yaml_comments.create_dumper(before=before)
+    yaml.dump(data, file, dumper)
+```
+
+Result:
+```yaml
+a:
+  b:
+    c:
+      d:
+      - 1
+      # test comment
+      - 2
+```
+
 ### Before and after comments
 
 Code:
