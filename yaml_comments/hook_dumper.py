@@ -14,6 +14,10 @@ DOUBLE_QUOTE = "\""
 FOLDED = ">"  # replace newlines with spaces
 LITERAL = "|" # keep newlines
 
+EXPAND = False
+INLINE = True
+
+
 @dataclass
 class AbstractKey:
     index: Any
@@ -124,6 +128,7 @@ class _Dumper(yaml.Dumper):
         style: Union[Dict[str, Any], None] = None,
         before: Union[Dict[str, Any], None] = None,
         after: Union[Dict[str, Any], None] = None,
+        flow_style: Union[Dict[str, Any], None] = None,
         delimiter: str = "/",
         **kwargs,
     ):
@@ -137,6 +142,7 @@ class _Dumper(yaml.Dumper):
         self._style = style.copy() if isinstance(style, dict) else dict()
         self._after = after.copy() if isinstance(after, dict) else dict()
         self._before = before.copy() if isinstance(before, dict) else dict()
+        self._flow_style = flow_style.copy() if isinstance(flow_style, dict) else dict()
 
         self._last_hooked_after = None
         self._last_hooked_before = None
@@ -173,6 +179,12 @@ class _Dumper(yaml.Dumper):
         return None, ""
 
     def serialize_node(self, node, parent, index):
+        if isinstance(node, yaml.SequenceNode):
+            print(node, self._repr_path())
+            for rule, style in self._flow_style.items():
+                if re.match(rule, self._repr_path()):
+                    node.flow_style = style
+
         if isinstance(node, yaml.MappingNode):
             if len(self._path) > 0:
                 if isinstance(self._path[-1], _Sequence) and isinstance(index, int):
@@ -390,6 +402,7 @@ def create_dumper(
     style: Union[Dict[str, Any], None] = None,
     before: Union[Dict[str, Any], None] = None,
     after: Union[Dict[str, Any], None] = None,
+    flow_style: Union[Dict[str, Any], None] = None,
     delimiter: str = "/",
 ) -> Type[_Dumper]:
     return functools.partial(
@@ -397,5 +410,6 @@ def create_dumper(
         style=style,
         after=after,
         before=before,
+        flow_style=flow_style,
         delimiter=delimiter,
     )  # type: ignore

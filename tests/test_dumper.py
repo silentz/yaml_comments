@@ -17,6 +17,7 @@ class Tests:
         before: Union[Dict[str, Any], None] = None,
         after: Union[Dict[str, Any], None] = None,
         style: Union[Dict[str, Any], None] = None,
+        flow_style: Union[Dict[str, Any], None] = None,
         indent: int = 2,
     ) -> str:
         # run custom dumper with args and return result
@@ -24,6 +25,7 @@ class Tests:
             before=before,
             after=after,
             style=style,
+            flow_style=flow_style,
             delimiter="/",
         )
         buffer = io.StringIO(initial_value="")
@@ -578,6 +580,56 @@ a: >+
 """.lstrip()
         )
 
+    def test_list_style_inline(self) -> None:
+        data = {"a": [1, 2, 3]}
+        flow_style = {
+            "^a$": yaml_comments.INLINE,
+        }
+        result = self.dump_with_args(data, flow_style=flow_style, indent=2)
+
+        assert (
+            result
+            == """a: [1, 2, 3]\n""".lstrip()
+        )
+
+    def test_list_style_expand(self) -> None:
+        data = {"a": [1, 2, 3]}
+        flow_style = {
+            "^a$": yaml_comments.EXPAND,
+        }
+        result = self.dump_with_args(data, flow_style=flow_style, indent=2)
+
+        assert (
+            result
+            == """
+a:
+- 1
+- 2
+- 3
+""".lstrip()
+        )
+
+    def test_list_style_inline_before_after(self) -> None:
+        data = {"a": [1, 2, 3]}
+        flow_style = {
+            "^a$": yaml_comments.INLINE,
+        }
+        before = {
+            "^a$": "# before a",
+        }
+        after = {
+            "^a$": "# after a",
+        }
+        result = self.dump_with_args(data, flow_style=flow_style, before=before, after=after, indent=2)
+
+        assert (
+            result
+            == """
+# before a
+a: [1, 2, 3]
+# after a
+""".lstrip()
+        )
+
 # TODO styles:
-#   * test different list styles + comments
 #   * test different dict styles + comments

@@ -4,4 +4,6 @@ from .hook_dumper import (
     DOUBLE_QUOTE,
     FOLDED,
     LITERAL,
+    EXPAND,
+    INLINE,
 )
