@@ -11,8 +11,8 @@ include different corner cases, like adding a comment to N-th list element or to
 ### Basic case
 
 In this example descriptor for writing a comment looks like this: `$a/b/c/d/1$`. This path
-is composed of dict keys and `/` delimiter. If you want to use some other delimiter, you
-should pass it to `create_dumper` function like this: `yaml_comments.create_dumper(..., delimiter="#")`.
+is composed of dict keys and list indexes, and `/` delimiter. If you want to use some other delimiter, you
+should pass it to `create_dumper` function like this: `yaml_comments.create_dumper(..., delimiter="#")`
 
 Code:
 ```python
