@@ -179,7 +179,7 @@ class _Dumper(yaml.Dumper):
         return None, ""
 
     def serialize_node(self, node, parent, index):
-        if isinstance(node, yaml.SequenceNode):
+        if isinstance(node, yaml.SequenceNode) or isinstance(node, yaml.MappingNode):
             print(node, self._repr_path())
             for rule, style in self._flow_style.items():
                 if re.match(rule, self._repr_path()):

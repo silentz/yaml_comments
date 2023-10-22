@@ -631,5 +631,52 @@ a: [1, 2, 3]
 """.lstrip()
         )
 
-# TODO styles:
-#   * test different dict styles + comments
+    def test_dict_style_inline(self) -> None:
+        data = {"a": {"k1": "v1", "k2": "v2"}}
+        flow_style = {
+            "^a$": yaml_comments.INLINE,
+        }
+        result = self.dump_with_args(data, flow_style=flow_style, indent=2)
+
+        assert (
+            result
+            == """a: {k1: v1, k2: v2}\n""".lstrip()
+        )
+
+    def test_dict_style_expand(self) -> None:
+        data = {"a": {"k1": "v1", "k2": "v2"}}
+        flow_style = {
+            "^a$": yaml_comments.EXPAND,
+        }
+        result = self.dump_with_args(data, flow_style=flow_style, indent=2)
+
+        assert (
+            result
+            == """
+a:
+  k1: v1
+  k2: v2
+""".lstrip()
+        )
+
+    def test_dict_style_inline_before_after(self) -> None:
+        data = {"a": {"k1": "v1", "k2": "v2"}}
+        flow_style = {
+            "^a$": yaml_comments.INLINE,
+        }
+        before = {
+            "^a$": "# before a",
+        }
+        after = {
+            "^a$": "# after a",
+        }
+        result = self.dump_with_args(data, flow_style=flow_style, before=before, after=after, indent=2)
+
+        assert (
+            result
+            == """
+# before a
+a: {k1: v1, k2: v2}
+# after a
+""".lstrip()
+        )
