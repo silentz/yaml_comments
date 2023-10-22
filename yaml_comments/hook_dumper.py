@@ -8,6 +8,12 @@ from typing import IO, Any, Callable, Dict, Iterable, List, Tuple, Type, Union
 import yaml
 
 
+SINGLE_QUOTE = "'"
+DOUBLE_QUOTE = "\""
+
+FOLDED = ">"  # replace newlines with spaces
+LITERAL = "|" # keep newlines
+
 @dataclass
 class AbstractKey:
     index: Any

@@ -9,11 +9,6 @@ import yaml
 
 import yaml_comments
 
-# TODO styles:
-#   * test different string styles
-#   * test different list styles + comments
-#   * test different dict styles + comments
-
 
 class Tests:
     def dump_with_args(
@@ -454,3 +449,135 @@ a:
 # after a
 """.lstrip()
         )
+
+    def test_string_style_single_quote(self) -> None:
+        data = {"a": [{"b": [{"c": ["11"]}]}]}
+        style = {
+            "^a/0/b/0/c/0$": yaml_comments.SINGLE_QUOTE,
+        }
+        result = self.dump_with_args(data, style=style, indent=2)
+
+        assert (
+            result
+            == """
+a:
+- b:
+  - c:
+    - '11'
+""".lstrip()
+        )
+
+    def test_string_style_double_quote(self) -> None:
+        data = {"a": [{"b": [{"c": ["11"]}]}]}
+        style = {
+            "^a/0/b/0/c/0$": yaml_comments.DOUBLE_QUOTE,
+        }
+        result = self.dump_with_args(data, style=style, indent=2)
+
+        assert (
+            result
+            == """
+a:
+- b:
+  - c:
+    - "11"
+""".lstrip()
+        )
+
+    def test_string_style_literal(self) -> None:
+        data = {"a": "abc"}
+        style = {
+            "^a$": yaml_comments.LITERAL,
+        }
+        result = self.dump_with_args(data, style=style, indent=2)
+
+        assert (
+            result
+            == """
+a: |-
+  abc
+""".lstrip()
+        )
+
+    def test_string_style_literal_newline_01(self) -> None:
+        data = {"a": "abc\n"}
+        style = {
+            "^a$": yaml_comments.LITERAL,
+        }
+        result = self.dump_with_args(data, style=style, indent=2)
+
+        assert (
+            result
+            == """
+a: |
+  abc
+""".lstrip()
+        )
+
+    def test_string_style_literal_newline_02(self) -> None:
+        data = {"a": "abc\n\n"}
+        style = {
+            "^a$": yaml_comments.LITERAL,
+        }
+        result = self.dump_with_args(data, style=style, indent=2)
+
+        assert (
+            result
+            == """
+a: |+
+  abc
+
+...
+""".lstrip()
+        )
+
+    def test_string_style_folded(self) -> None:
+        data = {"a": "abc"}
+        style = {
+            "^a$": yaml_comments.FOLDED,
+        }
+        result = self.dump_with_args(data, style=style, indent=2)
+
+        assert (
+            result
+            == """
+a: >-
+  abc
+""".lstrip()
+        )
+
+    def test_string_style_folded_newline_01(self) -> None:
+        data = {"a": "abc\n"}
+        style = {
+            "^a$": yaml_comments.FOLDED,
+        }
+        result = self.dump_with_args(data, style=style, indent=2)
+
+        assert (
+            result
+            == """
+a: >
+  abc
+""".lstrip()
+        )
+
+    def test_string_style_folded_newline_02(self) -> None:
+        data = {"a": "abc\n\n"}
+        style = {
+            "^a$": yaml_comments.FOLDED,
+        }
+        result = self.dump_with_args(data, style=style, indent=2)
+
+        assert (
+            result
+            == """
+a: >+
+  abc
+
+...
+""".lstrip()
+        )
+
+# TODO styles:
+#   * test different list styles + comments
+#   * test different dict styles + comments
