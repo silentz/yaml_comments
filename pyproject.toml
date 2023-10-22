@@ -1,10 +1,10 @@
 [tool.poetry]
-name = "yaml-utils"
+name = "yaml-comments"
 version = "0.1.0"
 description = ""
 authors = ["Max Pershin <mepershin@gmail.com>"]
 readme = "README.md"
-packages = [{include = "yaml_utils"}]
+packages = [{include = "yaml_comments"}]
 
 [tool.poetry.dependencies]
 python = "^3.7"

@@ -7,7 +7,7 @@ sys.path.insert(0, os.path.abspath(os.curdir))
 
 import yaml
 
-import yaml_utils
+import yaml_comments
 
 # TODO styles:
 #   * test different string styles
@@ -25,7 +25,7 @@ class Tests:
         indent: int = 2,
     ) -> str:
         # run custom dumper with args and return result
-        dumper = yaml_utils.create_dumper(
+        dumper = yaml_comments.create_dumper(
             before=before,
             after=after,
             style=style,
