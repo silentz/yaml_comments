@@ -86,3 +86,38 @@ a:
   k2: v2
 b: {k1: v1, k2: v2}
 ```
+
+### String scalar styles
+
+Code:
+```python
+import yaml
+import yaml_comments
+
+data = {"a": "test",
+        "b": "test",
+        "c": "multiline string n1\ntest",
+        "d": "multiline string n2\ntest"}
+
+style = {"a": yaml_comments.SINGLE_QUOTE,
+         "b": yaml_comments.DOUBLE_QUOTE,
+         "c": yaml_comments.FOLDED,
+         "d": yaml_comments.LITERAL}
+
+with open("result.yml", "w") as file:
+    dumper = yaml_comments.create_dumper(style=style)
+    yaml.dump(data, file, dumper)
+```
+
+Result:
+```yaml
+a: 'test'
+b: "test"
+c: >-
+  multiline string n1
+
+  test
+d: |-
+  multiline string n2
+  test
+```
