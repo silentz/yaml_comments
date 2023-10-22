@@ -8,7 +8,7 @@ Also supports style choosing for string scalars, lists and mappings. See example
 You can find more examples on using this lib in [tests/test_dumper.py](/tests/test_dumper.py). These examples
 include different corner cases, like adding a comment to N-th list element or to a specific dict key or value.
 
-### TLDR
+### Before and after comments
 
 Code:
 ```python
